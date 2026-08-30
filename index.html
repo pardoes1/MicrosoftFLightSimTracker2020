@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSFS 2020 Flight Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <img src="logo.svg" alt="MSFS Flight Tracker" class="logo" height="40">
+            <h1>MSFS 2020 Flight Tracker</h1>
+            <div class="header-controls">
+                <button id="connectBtn" class="btn btn-primary">Connect to MSFS</button>
+                <button id="clearBtn" class="btn btn-secondary">Clear Map</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="sidebar left-sidebar">
+            <div class="panel">
+                <h2>Flight Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Aircraft:</span>
+                        <span id="aircraftType" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Callsign:</span>
+                        <span id="callsign" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Altitude:</span>
+                        <span id="altitude" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Speed:</span>
+                        <span id="speed" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Heading:</span>
+                        <span id="heading" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Latitude:</span>
+                        <span id="latitude" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Longitude:</span>
+                        <span id="longitude" class="value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">On Ground:</span>
+                        <span id="onGround" class="value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>AI Traffic</h2>
+                <div class="traffic-controls">
+                    <label>
+                        <input type="checkbox" id="showAiTraffic" checked>
+                        Show AI Aircraft
+                    </label>
+                    <label>
+                        <input type="range" id="trafficRange" min="5" max="500" value="100">
+                        Range: <span id="rangeValue">100</span> nm
+                    </label>
+                </div>
+                <div id="aiTrafficList" class="traffic-list"></div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-controls">
+                <button id="zoomIn" class="map-btn">+</button>
+                <button id="zoomOut" class="map-btn">-</button>
+                <button id="locateMe" class="map-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="12" r="8"/>
+                        <line x1="12" y1="2" x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="2" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar right-sidebar">
+            <div class="panel">
+                <h2>Flight Path</h2>
+                <canvas id="altitudeChart" width="300" height="150"></canvas>
+                <div class="chart-labels">
+                    <span>Time</span>
+                    <span>Altitude (ft)</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalFlights">0</div>
+                        <div class="stat-label">Flights Tracked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalDistance">0</div>
+                        <div class="stat-label">Distance (nm)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="maxAltitude">0</div>
+                        <div class="stat-label">Max Altitude (ft)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="maxSpeed">0</div>
+                        <div class="stat-label">Max Speed (kts)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Settings</h2>
+                <div class="settings-form">
+                    <div class="setting-item">
+                        <label for="mapTheme">Map Theme</label>
+                        <select id="mapTheme">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="satellite">Satellite</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="updateInterval">Update Interval (ms)</label>
+                        <input type="number" id="updateInterval" min="100" max="5000" value="1000">
+                    </div>
+                    <div class="setting-item">
+                        <label for="serverUrl">Server URL</label>
+                        <input type="text" id="serverUrl" placeholder="http://localhost:3000" value="http://localhost:3000">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>MSFS 2020 Flight Tracker | Data from Microsoft Flight Simulator 2020</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
